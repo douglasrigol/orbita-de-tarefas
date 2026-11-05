@@ -1,0 +1,54 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Órbita de tarefas</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Bricolage+Grotesque:wght@500;700&family=DM+Sans:wght@400;500&display=swap" rel="stylesheet">
+<link rel="stylesheet" href="style.css">
+</head>
+<body>
+
+<section class="to" id="task-orbit" aria-label="Órbita de tarefas">
+  <div class="to-stage" aria-hidden="true"></div>
+  <div class="to-lbls" id="to-lbls" aria-hidden="true"></div>
+  <div class="to-tip" id="to-tip"><b></b><span></span></div>
+
+  <aside class="to-panel">
+    <header>
+      <h1>Órbita de tarefas</h1>
+      <p class="to-sub">Cada tarefa gira em torno do núcleo: prazos curtos ficam perto do centro. Conclua tarefas para o núcleo crescer.</p>
+    </header>
+    <div class="to-prog"><b id="to-pct">0%</b><span id="to-cnt"></span></div>
+    <div class="to-bar"><i id="to-barfill"></i></div>
+
+    <form id="to-form" autocomplete="off">
+      <input class="wide" id="to-in" type="text" maxlength="120" placeholder="Ex.: pagar a conta de luz" aria-label="Nova tarefa">
+      <select id="to-pr" aria-label="Prioridade"><option value="alta">Alta</option><option value="media" selected>Média</option><option value="baixa">Baixa</option></select>
+      <select id="to-ct" aria-label="Categoria"><option value="trabalho">Trabalho</option><option value="pessoal">Pessoal</option><option value="estudos">Estudos</option><option value="compras">Compras</option><option value="outros" selected>Outros</option></select>
+      <input id="to-dt" type="date" aria-label="Data de vencimento">
+      <select class="wide" id="to-ic" aria-label="Objeto 3D"><option value="auto">Objeto: automático pelo texto</option><option value="forma">Objeto: forma da categoria</option><option value="bulb">Lâmpada</option><option value="cart">Carrinho</option><option value="mail">Envelope</option><option value="cross">Saúde</option><option value="house">Casa</option><option value="laptop">Notebook</option><option value="book">Livro</option><option value="coin">Moeda</option></select>
+      <button class="to-add" type="submit">Lançar na órbita</button>
+    </form>
+
+    <div class="to-filters" role="toolbar" aria-label="Filtros">
+      <button class="to-pill" type="button" data-st="all" aria-pressed="true">Todas</button>
+      <button class="to-pill" type="button" data-st="active" aria-pressed="false">Pendentes</button>
+      <button class="to-pill" type="button" data-st="completed" aria-pressed="false">Concluídas</button>
+      <select id="to-cf" aria-label="Filtrar por categoria"><option value="all">Todas as categorias</option><option value="trabalho">Trabalho</option><option value="pessoal">Pessoal</option><option value="estudos">Estudos</option><option value="compras">Compras</option><option value="outros">Outros</option></select>
+    </div>
+
+    <ul class="to-list" id="to-list"></ul>
+    <div class="to-empty" id="to-empty" hidden>Nada na órbita. Lance sua primeira tarefa acima.</div>
+    <details class="to-leg"><summary>Legenda</summary><p>Cor = prioridade:<i style="--c:#ff5d73"></i>alta<i style="--c:#ffc857"></i>média<i style="--c:#5ec8ff"></i>baixa. O objeto vem do texto da tarefa. Quanto mais perto do núcleo, mais perto o prazo.</p></details>
+    <div class="to-foot"><span>Arraste a cena para girar · clique num objeto para concluir</span><button class="to-pill" type="button" id="to-clear">Limpar concluídas</button></div>
+  </aside>
+</section>
+
+<script src="https://cdnjs.cloudflare.com/ajax/libs/three.js/r128/three.min.js"></script>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/gsap/3.12.5/gsap.min.js"></script>
+<script src="script.js"></script>
+</body>
+</html>
