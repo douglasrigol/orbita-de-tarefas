@@ -52,7 +52,18 @@ border:2px solid rgba(160,180,255,.5);cursor:pointer;display:grid;place-items:ce
 .to-task:hover .to-x,.to-task:hover .to-ed,.to-task:focus-within .to-x,.to-task:focus-within .to-ed{opacity:1}.to-ed:hover{background:rgba(255,180,84,.16)!important;color:var(--amb)!important}.to-task{cursor:pointer}.to-x:hover{background:rgba(255,93,115,.18)!important;color:#ffc2cb!important}
 .to-empty{padding:26px 12px;text-align:center;color:var(--mut);border:1px dashed var(--line);border-radius:14px}
 .to-foot{display:flex;justify-content:space-between;align-items:center;color:var(--mut);font-size:.82rem}
-@media(max-width:760px){.to{min-height:700px}.to-panel{top:auto;height:62%;left:10px;right:10px;bottom:10px;width:auto;padding:16px}.to-sub{display:none}.to-x,.to-ed{opacity:1}}
+/* iOS ignora a largura do input de data com o visual nativo ligado */
+.to input[type=date]{-webkit-appearance:none;appearance:none;display:block;line-height:40px}
+.to input[type=date]::-webkit-date-and-time-value{text-align:left;margin:0}
+/* celular/tablet: a órbita ganha uma área própria no topo e o painel vem abaixo, rolando com a página */
+@media(max-width:760px){
+ .to{height:auto;min-height:0;overflow:visible;display:flex;flex-direction:column;--st:clamp(300px,52svh,480px)}
+ .to-stage{position:relative;inset:auto;flex:none;height:var(--st)}
+ .to-lbls{bottom:auto;height:var(--st)}
+ .to-panel{position:relative;inset:auto;width:auto;height:auto;margin:0 10px 10px;padding:16px}
+ .to-list{flex:none;overflow:visible}
+ .to-sub{display:none}.to-x,.to-ed{opacity:1}
+}
 @media(prefers-reduced-motion:reduce){.to *{transition-duration:.01ms!important}}
 
 .to-lbls{position:absolute;inset:0;z-index:1;pointer-events:none;overflow:hidden}
