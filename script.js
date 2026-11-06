@@ -220,11 +220,19 @@
     }
   }
 
-  canvas.addEventListener('pointerdown', e => { drag = { x: e.clientX, y: e.clientY }; moved = 0; canvas.setPointerCapture(e.pointerId); });
-  canvas.addEventListener('pointermove', e => {
+  function pick(e) {
     const b = canvas.getBoundingClientRect();
     mouse.x = (e.clientX - b.left) / b.width * 2 - 1;
     mouse.y = -((e.clientY - b.top) / b.height * 2 - 1);
+    ptr.set(mouse.x, mouse.y);
+    ray.setFromCamera(ptr, cam);
+    const hit = ray.intersectObjects([...objs.values()].map(o => o.mesh), true)[0];
+    let n = hit && hit.object; while (n && !n.userData.id) n = n.parent;
+    setHover(n ? n.userData.id : null, e);
+  }
+  // no toque não existe 'hover' antes do clique: o objeto é identificado já ao encostar
+  canvas.addEventListener('pointerdown', e => { drag = { x: e.clientX, y: e.clientY }; moved = 0; canvas.setPointerCapture(e.pointerId); pick(e); });
+  canvas.addEventListener('pointermove', e => {
     if (drag) {
       const dx = e.clientX - drag.x, dy = e.clientY - drag.y;
       moved += Math.abs(dx) + Math.abs(dy);
@@ -232,11 +240,7 @@
       world.rotation.x = Math.max(-.6, Math.min(.6, world.rotation.x + dy * .004));
       drag.x = e.clientX; drag.y = e.clientY;
     }
-    ptr.set(mouse.x, mouse.y);
-    ray.setFromCamera(ptr, cam);
-    const hit = ray.intersectObjects([...objs.values()].map(o => o.mesh), true)[0];
-    let n = hit && hit.object; while (n && !n.userData.id) n = n.parent;
-    setHover(n ? n.userData.id : null, e);
+    pick(e);
   });
   canvas.addEventListener('pointerup', () => { if (drag && moved < 5) { if (hover) toggle(hover); else unfocus(); } drag = null; });
   canvas.addEventListener('pointerleave', () => setHover(null));
@@ -338,7 +342,7 @@
 
   /* ---------- loop e layout ---------- */
   const clock = new THREE.Clock();
-  let W = 1, H = 1;
+  let W = 1, H = 1, ck = 1;   // ck afasta a câmera em telas estreitas para a órbita caber inteira
   const vv = new THREE.Vector3();
   function tick() {
     const dt = Math.min(clock.getDelta(), .05), t = clock.elapsedTime;
@@ -355,8 +359,8 @@
     if (!drag && !focusId) world.rotation.y += dt * .05 * M;
     stars.rotation.y += dt * .004 * M;
     cam.position.x += (mouse.x * 1.1 - cam.position.x) * .04;
-    cam.position.y += (2.4 + mouse.y * .6 - 1.2 * sc.p - cam.position.y) * .04;
-    cam.position.z = dist.v - 3.5 * sc.p;
+    cam.position.y += (2.4 * ck + mouse.y * .6 - 1.2 * sc.p - cam.position.y) * .04;
+    cam.position.z = dist.v * ck - 3.5 * sc.p;
     cam.lookAt(0, 0, 0);
     // rótulos: só os 4 objetos mais próximos da câmera
     const arr = [...objs.values()];
@@ -374,15 +378,18 @@
   new IntersectionObserver(([e]) => { cancelAnimationFrame(raf); if (e.isIntersecting) { clock.getDelta(); loop(); } }).observe(root);
 
   function resize() {
-    const w = root.clientWidth, h = root.clientHeight;
+    // o canvas acompanha a área da cena: tela toda no desktop, topo da página no celular
+    const w = stage.clientWidth, h = stage.clientHeight;
+    if (!w || !h) return;
     W = w; H = h;
     renderer.setSize(w, h, false);
     cam.aspect = w / h;
-    // empurra a cena para a área livre ao lado do painel (desktop) ou acima dele (mobile)
-    cam.setViewOffset(w, h, w > 760 ? -230 : 0, w > 760 ? 0 : h * .22, w, h);
+    ck = w > 760 ? 1 : Math.min(1.7, Math.max(1, 1.0 / cam.aspect));
+    // desktop: empurra a cena para a área livre ao lado do painel
+    cam.setViewOffset(w, h, w > 760 ? -230 : 0, 0, w, h);
     cam.updateProjectionMatrix();
   }
-  new ResizeObserver(resize).observe(root);
+  new ResizeObserver(resize).observe(stage);
   resize();
 
   /* abertura: um único momento orquestrado */
